@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+cd `dirname $0`
+
+cd codegen
+java -jar sbt-launch-0.7.4.jar update
+java -jar sbt-launch-0.7.4.jar compile-thrift-java
+
+cd ..
+rm -rf src/main/gen-java/org/apache/cassandra/thrift/
+
+mkdir -p src/main/gen-java/org/apache/cassandra/thrift
+cp -R codegen/target/scala_2.9.1/gen-java/org/apache/cassandra/thrift/* src/main/gen-java/org/apache/cassandra/thrift/
