@@ -1,0 +1,1 @@
+libraryDependencies += "org.apache.cassandra" % "cassandra-all" % "1.0.7"
