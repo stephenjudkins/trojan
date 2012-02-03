@@ -22,19 +22,13 @@ object CassandraBuild extends Build {
   val cassandraSettings = Seq(
     onLoad in Global := { (state) => state.put(cassandraDaemon, new CassandraDaemon) },
     startCassandra <<= (state, baseDirectory) map { (state, dir) => try {
-      val dataDir = dir / "cassandra"
       val daemon = state.get(cassandraDaemon).get
-      if (daemon.isRPCServerRunning) {
-        println("stopping!")
-        daemon.stop()
+      if (!daemon.isRPCServerRunning) {
+        System.setProperty("cassandra.config", (dir / "conf" / "cassandra.yaml").toURI.toString)
+
+        daemon.init(null)
+        daemon.start()
       }
-      IO.delete(dataDir)
-
-      System.setProperty("cassandra.config", (dir / "conf" / "cassandra.yaml").toURI.toString)
-      DatabaseDescriptor.createAllDirectories()
-
-      daemon.init(null)
-      daemon.start()
       } catch { case t: Throwable => t.printStackTrace() ; throw t}
     },
     stopCassandra <<= (state) map { state =>
